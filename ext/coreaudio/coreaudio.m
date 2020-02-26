@@ -444,6 +444,35 @@ ca_set_default_output_device(VALUE self, VALUE device)
     return Qtrue;
 }
 
+
+/*
+ * Document-method: CoreAudio.set_default_input_device
+ * call-seq:
+ *   CoreAudio.set_default_input_device(audio_device)
+ *
+ * Set system default audio input device as CoreAudio::AudioDevice object.
+ */
+static VALUE
+ca_set_default_input_device(VALUE self, VALUE device)
+{
+    AudioDeviceID devID = NUM2UINT(rb_ivar_get(device, sym_iv_devid));
+    AudioObjectPropertyAddress address = PropertyAddress;
+    UInt32 size;
+    OSStatus status;
+
+    address.mSelector = kAudioHardwarePropertyDefaultInputDevice;
+    address.mScope    = kAudioObjectPropertyScopeGlobal;
+    address.mElement  = kAudioObjectPropertyElementMaster;
+
+    status = AudioObjectSetPropertyData(kAudioObjectSystemObject, &address, 0, NULL, sizeof(devID), &devID);
+    if (status != noErr) {
+      rb_raise(rb_eArgError,
+               "coreaudio: set default input device failed: %d", status);
+    }
+
+    return Qtrue;
+}
+
 /*
  * Document-class: CoreAudio::OutLoop
  *
@@ -1159,6 +1188,7 @@ Init_coreaudio_ext(void)
     rb_define_singleton_method(rb_mCoreAudio, "default_input_device", ca_default_input_device, -1);
     rb_define_singleton_method(rb_mCoreAudio, "default_output_device", ca_default_output_device, -1);
     rb_define_singleton_method(rb_mCoreAudio, "set_default_output_device", ca_set_default_output_device, 1);
+    rb_define_singleton_method(rb_mCoreAudio, "set_default_input_device", ca_set_default_input_device, 1);
 
     rb_define_method(rb_cOutLoop, "[]=", ca_out_loop_data_assign, 2);
     rb_define_method(rb_cOutLoop, "start", ca_out_loop_data_start, 0);
