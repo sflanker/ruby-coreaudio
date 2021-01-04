@@ -15,7 +15,7 @@ Gem::Specification.new do |gem|
   gem.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
   gem.name          = "coreaudio"
   gem.require_paths = ["lib"]
-  gem.version       = CoreAudio::VERSION
+  gem.version       = "0.0.12-patched"
 
   gem.extensions = ["ext/coreaudio/extconf.rb"]
   gem.extra_rdoc_files = [
